@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class TicTacToe {
@@ -44,7 +43,7 @@ public class TicTacToe {
     }
 
     private static int[] solver(int[][] board) {
-        int best = Integer.MIN_VALUE;
+        int best = Integer.MAX_VALUE;
         int bestX = -1;
         int bestY = -1;
 
@@ -54,7 +53,7 @@ public class TicTacToe {
                     board[i][j] = -1;
                     int eval = minimax(board, 0, true);
                     board[i][j] = 0;
-                    if(eval > best) {
+                    if(eval < best) {
                         best = eval;
                         bestX = j;
                         bestY = i;
