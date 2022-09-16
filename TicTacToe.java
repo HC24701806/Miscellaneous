@@ -1,27 +1,33 @@
 import java.util.Scanner;
 
 public class TicTacToe {
-
+    static int x;
     public static void main(String[] args) {
         int[][] board = new int[3][3];
 
         Scanner s = new Scanner(System.in);
-        System.out.println("Player 1 or 2? (Note: X is always player, O is always computer");
-        int player;
-        if(s.nextInt() == 1) {
-            player = 0;
+        System.out.println("X or O?");
+        boolean player;
+        String input = s.next();
+        if(input.equalsIgnoreCase("X")) {
+            player = true;
+            x = 0;
+        } else if(input.equalsIgnoreCase("O")) {
+            player = false;
+            x = 1;
         } else {
-            player = 1;
+            System.out.println("Invalid input");
+            return;
         }
 
         while(true) {
-            if(player == 0) {
+            if(player) {
                 System.out.println("Enter coordinates of your choice (x, y).");
                 int x = s.nextInt();
                 int y = s.nextInt();
                 board[y][x] = 1;
             } else {
-                int[] bestMove = solver(board);
+                int[] bestMove = findBestMove(board);
                 board[bestMove[1]][bestMove[0]] = -1;
             }
             print(board);
@@ -38,12 +44,12 @@ public class TicTacToe {
                 break;
             }
 
-            player = 1 - player;
+            player = !player;
         }
     }
 
-    private static int[] solver(int[][] board) {
-        int best = Integer.MAX_VALUE;
+    private static int[] findBestMove(int[][] board) {
+        int best = Integer.MIN_VALUE;
         int bestX = -1;
         int bestY = -1;
 
@@ -51,9 +57,9 @@ public class TicTacToe {
             for(int j = 0; j < 3; ++j) {
                 if(board[i][j] == 0) {
                     board[i][j] = -1;
-                    int eval = minimax(board, 0, true);
+                    int eval = minimax(board, 1, true);
                     board[i][j] = 0;
-                    if(eval < best) {
+                    if(eval > best) {
                         best = eval;
                         bestX = j;
                         bestY = i;
@@ -62,13 +68,17 @@ public class TicTacToe {
             }
         }
 
+        System.out.println(bestX + " " + bestY + " " + best);
         return new int[] {bestX, bestY, best};
     }
 
     private static int minimax(int[][] board, int depth, boolean player) {
-        int score = 0;
-        if(eval(board) != 0) {
-            return score;
+        int score = eval(board);
+        if(score == 10) {
+            return score - depth;
+        }
+        if(score == -10) {
+            return score + depth;
         }
 
         if(isFull(board)) {
@@ -76,7 +86,7 @@ public class TicTacToe {
         }
 
         if(player) { //player
-            int best = 1000;
+            int best = Integer.MAX_VALUE;
             for(int i = 0; i < 3; ++i) {
                 for(int j = 0; j < 3; ++j) {
                     if(board[i][j] == 0) {
@@ -86,9 +96,9 @@ public class TicTacToe {
                     }
                 }
             }
-            return best + depth;
+            return best;
         } else { //ai
-            int best = -1000;
+            int best = Integer.MIN_VALUE;
             for(int i = 0; i < 3; ++i) {
                 for(int j = 0; j < 3; ++j) {
                     if(board[i][j] == 0) {
@@ -98,7 +108,7 @@ public class TicTacToe {
                     }
                 }
             }
-            return best - depth;
+            return best;
         }
     }
 
@@ -155,7 +165,13 @@ public class TicTacToe {
     }
 
     private static void print(int[][] board) {
-        char[] symbols = new char[] {'O', ' ', 'X'};
+        char[] symbols;
+        if(x == 0) {
+            symbols = new char[] {'O', ' ', 'X'};
+        } else {
+            symbols = new char[] {'X', ' ', 'O'};
+        }
+
         for(int i = 0; i < 3; ++i) {
             for(int j = 0; j < 2; ++j) {
                 System.out.print(symbols[board[i][j] + 1] + " | ");
