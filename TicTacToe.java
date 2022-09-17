@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class TicTacToe2 {
-    static int x;
+	static int x;
     public static void main(String[] args) {
         int[][] board = new int[3][3];
 
@@ -44,10 +44,10 @@ public class TicTacToe2 {
 
             int state = eval(board);
             if(state == 10) {
-                System.out.println("You win!");
+                System.out.println("Computer wins");
                 break;
             } else if(state == -10) {
-                System.out.println("Computer wins");
+                System.out.println("You win!");
                 break;
             } else if(isFull(board)) {
                 System.out.println("Draw");
