@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class TicTacToe2 {
-	static int x;
+    static int x;
     public static void main(String[] args) {
         int[][] board = new int[3][3];
 
