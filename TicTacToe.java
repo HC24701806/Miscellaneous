@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
-public class TicTacToe2 {
-	static int x;
+public class TicTacToe {
+    static int x;
     public static void main(String[] args) {
         int[][] board = new int[3][3];
 
@@ -25,17 +25,19 @@ public class TicTacToe2 {
             if(player) {
                 int x, y;
                 while(true) {
-                    System.out.println("Enter coordinates of your choice (x, y).");
-                	x = s.nextInt();
+                    System.out.println("Enter coordinates of your choice without commas (e.g. 0 0).");
+                    x = s.nextInt();
                     y = s.nextInt();
-                    if(board[y][x] == 0) {
-                    	board[y][x] = -1;
-                    	break;
+                    if(x < 0 || x >= 3 || y < 0 || y >= 3) {
+                        System.out.println("Invalid input, please enter another coordinate.");
+                    } else if(board[y][x] != 0) {
+                        System.out.println("This coordinate is already taken.");
                     } else {
-                    	System.out.println("This coordinate is already taken.");
+                        board[y][x] = -1;
+                        break;
                     }
                 }
-                
+
             } else {
                 int[] bestMove = findBestMove(board);
                 board[bestMove[1]][bestMove[0]] = 1;
@@ -79,7 +81,6 @@ public class TicTacToe2 {
             }
         }
 
-        System.out.println(bestX + " " + bestY + " " + best);
         return new int[] {bestX, bestY, best};
     }
 
@@ -94,83 +95,83 @@ public class TicTacToe2 {
         }
 
         if(isAI) {
-			int best = Integer.MIN_VALUE;
-			for(int i = 0; i < 3; ++i) {
-				for(int j = 0; j < 3; ++j) {
-					if(board[i][j] == 0) {
-						board[i][j] = 1;
-						best = Math.max(minimax(board, depth + 1, false), best);
-						board[i][j] = 0;
-					}
-				}
-			}
-			return best - depth;
-		} else {
-			int best = Integer.MAX_VALUE;
-			for(int i = 0; i < 3; ++i) {
-				for(int j = 0; j < 3; ++j) {
-					if(board[i][j] == 0) {
-						board[i][j] = -1;
-						best = Math.min(minimax(board, depth + 1, true), best);
-						board[i][j] = 0;
-					}
-				}
-			}
-			return best + depth;
-		}
+            int best = Integer.MIN_VALUE;
+            for(int i = 0; i < 3; ++i) {
+                for(int j = 0; j < 3; ++j) {
+                    if(board[i][j] == 0) {
+                        board[i][j] = 1;
+                        best = Math.max(minimax(board, depth + 1, false), best);
+                        board[i][j] = 0;
+                    }
+                }
+            }
+            return best - depth;
+        } else {
+            int best = Integer.MAX_VALUE;
+            for(int i = 0; i < 3; ++i) {
+                for(int j = 0; j < 3; ++j) {
+                    if(board[i][j] == 0) {
+                        board[i][j] = -1;
+                        best = Math.min(minimax(board, depth + 1, true), best);
+                        board[i][j] = 0;
+                    }
+                }
+            }
+            return best + depth;
+        }
     }
 
     private static int eval(int[][] board) {
-		int sum = 0;
-		for(int i = 0; i < 3; ++i) {
-			for(int j = 0; j < 3; ++j) {
-				sum += board[i][j];
-			}
-			if(Math.abs(sum) == 3) {
-				return sum/3 * 10;
-			}
-			sum = 0;
-		}
-		
-		for(int i = 0; i < 3; ++i) {
-			for(int j = 0; j < 3; ++j) {
-				sum += board[j][i];
-			}
-			if(Math.abs(sum) == 3) {
-				return sum/3 * 10;
-			}
-			sum = 0;
-		}
-		
-		for(int i = 0; i < 3; ++i) {
-			sum += board[i][i];
-		}
-		if(Math.abs(sum) == 3) {
-			return sum/3 * 10;
-		}
-		sum = 0;
-		
-		for(int i = 0; i < 3; ++i) {
-			sum += board[i][2 - i];
-		}
-		if(Math.abs(sum) == 3) {
-			return sum/3 * 10;
-		}
-		sum = 0;
-		
-		return 0;
-	}
+        int sum = 0;
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                sum += board[i][j];
+            }
+            if(Math.abs(sum) == 3) {
+                return sum/3 * 10;
+            }
+            sum = 0;
+        }
+
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                sum += board[j][i];
+            }
+            if(Math.abs(sum) == 3) {
+                return sum/3 * 10;
+            }
+            sum = 0;
+        }
+
+        for(int i = 0; i < 3; ++i) {
+            sum += board[i][i];
+        }
+        if(Math.abs(sum) == 3) {
+            return sum/3 * 10;
+        }
+        sum = 0;
+
+        for(int i = 0; i < 3; ++i) {
+            sum += board[i][2 - i];
+        }
+        if(Math.abs(sum) == 3) {
+            return sum/3 * 10;
+        }
+        sum = 0;
+
+        return 0;
+    }
 
     private static boolean isFull(int[][] board) {
-		for(int i = 0; i < 3; ++i) {
-			for(int j = 0; j < 3; ++j) {
-				if(board[i][j] == 0) {
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                if(board[i][j] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
     private static void print(int[][] board) {
         char[] symbols;
