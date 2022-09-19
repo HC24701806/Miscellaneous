@@ -25,7 +25,7 @@ public class TicTacToe {
             if(player) {
                 int x, y;
                 while(true) {
-                    System.out.println("Enter coordinates of your choice without commas (e.g. 0 0).");
+                    System.out.println("Enter coordinates of your choice (0-2) without commas (e.g. 0 0).");
                     x = s.nextInt();
                     y = s.nextInt();
                     if(x < 0 || x >= 3 || y < 0 || y >= 3) {
