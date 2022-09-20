@@ -1,0 +1,218 @@
+import java.util.*;
+
+public class ConnectFour {
+    static int x;
+    static int[] lowest;
+    public static void main(String[] args) {
+        int[][] board = new int[6][7];
+
+        Scanner s = new Scanner(System.in);
+        System.out.println("Y or R? (Y goes first)");
+        boolean player;
+        String input = s.next();
+        if(input.equalsIgnoreCase("Y")) {
+            player = true;
+            x = 0;
+        } else if(input.equalsIgnoreCase("R")) {
+            player = false;
+            x = 1;
+        } else {
+            System.out.println("Invalid input");
+            s.close();
+            return;
+        }
+
+        lowest = new int[7];
+        Arrays.fill(lowest, 5);
+        while(true) {
+            if(player) {
+                int col;
+                while(true) {
+                    System.out.println("Enter the column of your choice (0-6).");
+                    col = s.nextInt();
+                    if(col < 0 || col >= 6 || lowest[col] < 0) {
+                        System.out.println("Invalid input, please enter another coordinate.");
+                    } else if(board[lowest[col]][col] != 0) {
+                        System.out.println("This coordinate is already taken.");
+                    } else {
+                        board[lowest[col]][col] = -1;
+                        lowest[col]--;
+                        break;
+                    }
+                }
+
+            } else {
+                int bestMove =
+                board[bestMove[1]][bestMove[0]] = 1;
+
+            }
+            print(board);
+
+            int state = eval(board);
+            if(state == 10) {
+                System.out.println("Computer wins");
+                break;
+            } else if(state == -10) {
+                System.out.println("You win!");
+                break;
+            } else if(isFull(board)) {
+                System.out.println("Draw");
+                break;
+            }
+
+            player = !player;
+        }
+        s.close();
+    }
+
+    private static int findBestMove(int[][] board) {
+        int best = Integer.MIN_VALUE;
+        int bestCol = -1;
+
+        for(int i = 0; i < 7; ++i) {
+            if(board[lowest[i]][i] == 0) {
+                board[lowest[i]][i] = 1;
+                int eval = minimax(board, 0, false);
+                board[lowest[i]][i] = 0;
+                if(eval > best) {
+                    best = eval;
+                    bestX = j;
+                    bestY = i;
+                }
+            }
+        }
+
+        return bestCol;
+    }
+
+    private static int minimax(int[][] board, int depth, boolean isAI) {
+        int score = eval(board);
+        if(score != 0) {
+            return score;
+        }
+
+        if(isFull(board)) {
+            return 0;
+        }
+
+        if(isAI) {
+            int best = Integer.MIN_VALUE;
+            for(int i = 0; i < 3; ++i) {
+                for(int j = 0; j < 3; ++j) {
+                    if(board[i][j] == 0) {
+                        board[i][j] = 1;
+                        best = Math.max(minimax(board, depth + 1, false), best);
+                        board[i][j] = 0;
+                    }
+                }
+            }
+            return best - depth;
+        } else {
+            int best = Integer.MAX_VALUE;
+            for(int i = 0; i < 3; ++i) {
+                for(int j = 0; j < 3; ++j) {
+                    if(board[i][j] == 0) {
+                        board[i][j] = -1;
+                        best = Math.min(minimax(board, depth + 1, true), best);
+                        board[i][j] = 0;
+                    }
+                }
+            }
+            return best + depth;
+        }
+    }
+
+    private static int eval(int[][] board) {
+        int sum;
+
+        for(int i = 0; i < 6; ++i) {
+            sum = 0;
+            for(int j = 0; j < 4; ++j) {
+                sum += board[i][j];
+            }
+
+            for(int j = 0; j < 3; ++j) {
+                if(Math.abs(sum) == 4) {
+                    return sum / 4 * 10;
+                }
+                sum -= board[i][j];
+                sum += board[i][j + 4];
+            }
+            if(Math.abs(sum) == 4) {
+                return sum / 4 * 10;
+            }
+        }
+
+        for(int i = 0; i < 7; ++i) {
+            sum = 0;
+            for(int j = 0; j < 4; ++j) {
+                sum += board[j][i];
+            }
+
+            for(int j = 0; j < 2; ++j) {
+                if(Math.abs(sum) == 4) {
+                    return sum / 4 * 10;
+                }
+                sum -= board[j][i];
+                sum += board[j + 4][i];
+            }
+            if(Math.abs(sum) == 4) {
+                return sum / 4 * 10;
+            }
+        }
+
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 4; ++j) {
+                sum = 0;
+                for(int k = 0; k < 4; ++k) {
+                    sum += board[i + k][j + k];
+                }
+                if(Math.abs(sum) == 4) {
+                    return sum / 4 * 10;
+                }
+            }
+        }
+
+        for(int i = 3; i < 6; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                sum = 0;
+                for(int k = 0; k < 4; ++k) {
+                    sum += board[i - k][j + k];
+                }
+                if(Math.abs(sum) == 4) {
+                    return sum / 4 * 10;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private static boolean isFull(int[][] board) {
+        for(int i = 0; i < 6; ++i) {
+            for(int j = 0; j < 7; ++j) {
+                if(board[i][j] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static void print(int[][] board) {
+        char[] symbols;
+        if(x == 0) {
+            symbols = new char[] {'Y', ' ', 'R'};
+        } else {
+            symbols = new char[] {'R', ' ', 'Y'};
+        }
+
+        for(int i = 0; i < 6; ++i) {
+            for(int j = 0; j < 6; ++j) {
+                System.out.print(symbols[board[i][j] + 1] + " | ");
+            }
+            System.out.println(symbols[board[i][6] + 1]);
+        }
+        System.out.println("\n");
+    }
+}
