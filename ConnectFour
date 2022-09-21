@@ -42,17 +42,17 @@ public class ConnectFour {
                 }
 
             } else {
-                int bestMove =
-                board[bestMove[1]][bestMove[0]] = 1;
-
+                int bestMove = findBestMove(board);
+                board[lowest[bestMove]][bestMove] = 1;
+                lowest[bestMove]--;
             }
             print(board);
 
             int state = eval(board);
-            if(state == 10) {
+            if(state == 100) {
                 System.out.println("Computer wins");
                 break;
-            } else if(state == -10) {
+            } else if(state == -100) {
                 System.out.println("You win!");
                 break;
             } else if(isFull(board)) {
@@ -70,14 +70,15 @@ public class ConnectFour {
         int bestCol = -1;
 
         for(int i = 0; i < 7; ++i) {
-            if(board[lowest[i]][i] == 0) {
+            if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
                 board[lowest[i]][i] = 1;
+                lowest[i]--;
                 int eval = minimax(board, 0, false);
+                lowest[i]++;
                 board[lowest[i]][i] = 0;
                 if(eval > best) {
                     best = eval;
-                    bestX = j;
-                    bestY = i;
+                    bestCol = i;
                 }
             }
         }
@@ -97,25 +98,25 @@ public class ConnectFour {
 
         if(isAI) {
             int best = Integer.MIN_VALUE;
-            for(int i = 0; i < 3; ++i) {
-                for(int j = 0; j < 3; ++j) {
-                    if(board[i][j] == 0) {
-                        board[i][j] = 1;
-                        best = Math.max(minimax(board, depth + 1, false), best);
-                        board[i][j] = 0;
-                    }
+            for(int i = 0; i < 7; ++i) {
+                if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
+                    board[lowest[i]][i] = 1;
+                    lowest[i]--;
+                    best = Math.max(minimax(board, depth + 1, false), best);
+                    lowest[i]++;
+                    board[lowest[i]][i] = 0;
                 }
             }
             return best - depth;
         } else {
             int best = Integer.MAX_VALUE;
-            for(int i = 0; i < 3; ++i) {
-                for(int j = 0; j < 3; ++j) {
-                    if(board[i][j] == 0) {
-                        board[i][j] = -1;
-                        best = Math.min(minimax(board, depth + 1, true), best);
-                        board[i][j] = 0;
-                    }
+            for(int i = 0; i < 7; ++i) {
+                if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
+                    board[lowest[i]][i] = -1;
+                    lowest[i]--;
+                    best = Math.min(minimax(board, depth + 1, true), best);
+                    lowest[i]++;
+                    board[lowest[i]][i] = 0;
                 }
             }
             return best + depth;
@@ -133,13 +134,13 @@ public class ConnectFour {
 
             for(int j = 0; j < 3; ++j) {
                 if(Math.abs(sum) == 4) {
-                    return sum / 4 * 10;
+                    return sum/4 * 100;
                 }
                 sum -= board[i][j];
                 sum += board[i][j + 4];
             }
             if(Math.abs(sum) == 4) {
-                return sum / 4 * 10;
+                return sum/4 * 100;
             }
         }
 
@@ -151,13 +152,13 @@ public class ConnectFour {
 
             for(int j = 0; j < 2; ++j) {
                 if(Math.abs(sum) == 4) {
-                    return sum / 4 * 10;
+                    return sum/4 * 100;
                 }
                 sum -= board[j][i];
                 sum += board[j + 4][i];
             }
             if(Math.abs(sum) == 4) {
-                return sum / 4 * 10;
+                return sum/4 * 100;
             }
         }
 
@@ -168,7 +169,7 @@ public class ConnectFour {
                     sum += board[i + k][j + k];
                 }
                 if(Math.abs(sum) == 4) {
-                    return sum / 4 * 10;
+                    return sum/4 * 100;
                 }
             }
         }
@@ -180,7 +181,7 @@ public class ConnectFour {
                     sum += board[i - k][j + k];
                 }
                 if(Math.abs(sum) == 4) {
-                    return sum / 4 * 10;
+                    return sum/4 * 100;
                 }
             }
         }
