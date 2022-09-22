@@ -9,17 +9,19 @@ public class ConnectFour {
         Scanner s = new Scanner(System.in);
         System.out.println("Y or R? (Y goes first)");
         boolean player;
-        String input = s.next();
-        if(input.equalsIgnoreCase("Y")) {
-            player = true;
-            x = 0;
-        } else if(input.equalsIgnoreCase("R")) {
-            player = false;
-            x = 1;
-        } else {
-            System.out.println("Invalid input");
-            s.close();
-            return;
+        while(true) {
+            String input = s.nextLine();
+            if (input.equalsIgnoreCase("Y")) {
+                player = true;
+                x = 0;
+                break;
+            } else if (input.equalsIgnoreCase("R")) {
+                player = false;
+                x = 1;
+                break;
+            } else {
+                System.out.println("Invalid input");
+            }
         }
 
         lowest = new int[7];
@@ -29,13 +31,18 @@ public class ConnectFour {
                 int col;
                 while(true) {
                     System.out.println("Enter the column of your choice (0-6).");
-                    col = s.nextInt();
-                    if(col < 0 || col >= 6 || lowest[col] < 0) {
-                        System.out.println("Invalid input, please choose another column.");
+                    String tempInput = s.nextLine();
+                    if(validInput(tempInput)) {
+                        col = Integer.parseInt(tempInput);
+                        if(col < 0 || col >= 7 || lowest[col] < 0) {
+                            System.out.println("Invalid input, please choose another column.");
+                        } else {
+                            board[lowest[col]][col] = -1;
+                            lowest[col]--;
+                            break;
+                        }
                     } else {
-                        board[lowest[col]][col] = -1;
-                        lowest[col]--;
-                        break;
+                        System.out.println("Invalid input, please try again.");
                     }
                 }
 
@@ -85,7 +92,7 @@ public class ConnectFour {
     }
 
     private static int minimax(int[][] board, int depth, boolean isAI) {
-        if(depth == 7) {
+        if(depth == 9) {
             return 0;
         }
 
@@ -217,5 +224,14 @@ public class ConnectFour {
             System.out.println(symbols[board[i][6] + 1]);
         }
         System.out.println("\n");
+    }
+
+    private static boolean validInput(String input) {
+        try {
+            Integer.parseInt(input);
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
     }
 }
