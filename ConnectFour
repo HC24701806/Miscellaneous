@@ -47,6 +47,7 @@ public class ConnectFour {
                 }
 
             } else {
+                System.out.println("Processing, please wait.\n");
                 int bestMove = findBestMove(board);
                 board[lowest[bestMove]][bestMove] = 1;
                 lowest[bestMove]--;
