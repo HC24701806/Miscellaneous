@@ -87,6 +87,10 @@ public class ConnectFour {
     }
 
     private static int minimax(int[][] board, int depth, boolean isAI) {
+        if(depth == 7) {
+            return 0;
+        }
+
         int score = eval(board);
         if(score != 0) {
             return score;
