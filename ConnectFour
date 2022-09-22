@@ -31,9 +31,7 @@ public class ConnectFour {
                     System.out.println("Enter the column of your choice (0-6).");
                     col = s.nextInt();
                     if(col < 0 || col >= 6 || lowest[col] < 0) {
-                        System.out.println("Invalid input, please enter another coordinate.");
-                    } else if(board[lowest[col]][col] != 0) {
-                        System.out.println("This coordinate is already taken.");
+                        System.out.println("Invalid input, please choose another column.");
                     } else {
                         board[lowest[col]][col] = -1;
                         lowest[col]--;
