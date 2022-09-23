@@ -79,7 +79,7 @@ public class ConnectFour {
             if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
                 board[lowest[i]][i] = 1;
                 lowest[i]--;
-                int eval = minimax(board, 0, false);
+                int eval = minimax(board, 0, false, Integer.MIN_VALUE, Integer.MAX_VALUE);
                 lowest[i]++;
                 board[lowest[i]][i] = 0;
                 if(eval > best) {
@@ -92,11 +92,11 @@ public class ConnectFour {
         return bestCol;
     }
 
-    private static int minimax(int[][] board, int depth, boolean isAI) {
-        if(depth == 9) {
-            return 0;
-        }
-
+    private static int minimax(int[][] board, int depth, boolean isAI, int a, int b) {
+    	if(depth == 12) {
+    		return 0;
+    	}
+    	
         int score = eval(board);
         if(score != 0) {
             return score;
@@ -112,9 +112,14 @@ public class ConnectFour {
                 if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
                     board[lowest[i]][i] = 1;
                     lowest[i]--;
-                    best = Math.max(minimax(board, depth + 1, false), best);
+                    best = Math.max(minimax(board, depth + 1, false, a, b), best);
+                    a = Math.max(a, best);
                     lowest[i]++;
                     board[lowest[i]][i] = 0;
+                    
+                    if(a > b) {
+                    	break;
+                    }
                 }
             }
             return best - depth;
@@ -124,9 +129,14 @@ public class ConnectFour {
                 if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
                     board[lowest[i]][i] = -1;
                     lowest[i]--;
-                    best = Math.min(minimax(board, depth + 1, true), best);
+                    best = Math.min(minimax(board, depth + 1, true, a, b), best);
+                    b = Math.min(b, best);
                     lowest[i]++;
                     board[lowest[i]][i] = 0;
+                    
+                    if(a > b) {
+                    	break;
+                    }
                 }
             }
             return best + depth;
