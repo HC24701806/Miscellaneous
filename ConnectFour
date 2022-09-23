@@ -69,13 +69,15 @@ public class ConnectFour {
             player = !player;
         }
         s.close();
+        eval(board);
     }
 
     private static int findBestMove(int[][] board) {
         int best = Integer.MIN_VALUE;
         int bestCol = -1;
 
-        for(int i = 0; i < 7; ++i) {
+        int[] searchOrder = new int[] {3, 2, 4, 1, 5, 0, 6};
+        for(int i : searchOrder) {
             if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
                 board[lowest[i]][i] = 1;
                 lowest[i]--;
@@ -106,9 +108,10 @@ public class ConnectFour {
             return 0;
         }
 
+        int[] searchOrder = new int[] {3, 2, 4, 1, 5, 0, 6};
         if(isAI) {
             int best = Integer.MIN_VALUE;
-            for(int i = 0; i < 7; ++i) {
+            for(int i : searchOrder) {
                 if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
                     board[lowest[i]][i] = 1;
                     lowest[i]--;
@@ -125,7 +128,7 @@ public class ConnectFour {
             return best - depth;
         } else {
             int best = Integer.MAX_VALUE;
-            for(int i = 0; i < 7; ++i) {
+            for(int i : searchOrder) {
                 if(lowest[i] >= 0 && board[lowest[i]][i] == 0) {
                     board[lowest[i]][i] = -1;
                     lowest[i]--;
@@ -195,7 +198,7 @@ public class ConnectFour {
         }
 
         for(int i = 3; i < 6; ++i) {
-            for(int j = 0; j < 3; ++j) {
+            for(int j = 0; j < 4; ++j) {
                 sum = 0;
                 for(int k = 0; k < 4; ++k) {
                     sum += board[i - k][j + k];
