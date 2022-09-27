@@ -1,0 +1,275 @@
+import java.util.*;
+
+public class UltimateTicTacToe {
+    static int x;
+    static int[][][][] board = new int[3][3][3][3];
+    static int[] currBoard;
+    public static void main(String[] args) {
+        currBoard = new int[] {-1, -1};
+
+        Scanner s = new Scanner(System.in);
+        System.out.println("X or O?");
+        boolean player;
+        String input = s.next();
+        if(input.equalsIgnoreCase("X")) {
+            player = true;
+            x = 0;
+        } else if(input.equalsIgnoreCase("O")) {
+            player = false;
+            x = 1;
+        } else {
+            System.out.println("Invalid input");
+            s.close();
+            return;
+        }
+
+        while(true) {
+            if(player) {
+                int x, y;
+                if(currBoard[0] == -1) {
+                    while(true) {
+                        System.out.println("Enter coordinates of your desired board (0-2) without commas (e.g. 0 0).");
+                        input = s.nextLine();
+                        String[] temp = input.split(" ");
+                        if(!isInteger(temp[0]) || !isInteger(temp[1])) {
+                            System.out.println("Invalid input, please try again.");
+                        } else if(x < 0 || x >= 3 || y < 0 || y >= 3) {
+                            System.out.println("Invalid input, please enter another coordinate.");
+                        } else if(isFull(board[y][x])) {
+                            System.out.println("This board is already full.");
+                        } else {
+                            currBoard = new int[] {x, y};
+                            break;
+                        }
+                    }
+                }
+
+                while(true) {
+                    System.out.println("Enter coordinates of your choice (0-2) without commas (e.g. 0 0).");
+                    input = s.nextLine();
+                    String[] temp = input.split(" ");
+                    if(!isInteger(temp[0]) || !isInteger(temp[1])) {
+                        System.out.println("Invalid input, please try again.");
+                    } else if(x < 0 || x >= 3 || y < 0 || y >= 3) {
+                        System.out.println("Invalid input, please enter another coordinate.");
+                    } else if(board[currBoard[1]][currBoard[0]][y][x] != 0) {
+                        System.out.println("This coordinate is already taken.");
+                    } else {
+                        board[currBoard[1]][currBoard[0]][y][x] = -1;
+                        currBoard = new int[] {y, x};
+                        break;
+                    }
+                }
+
+            } else {
+                int[] bestMove = findBestMove();
+                board[currBoard[1]][currBoard[0]][bestMove[1]][bestMove[0]] = 1;
+            }
+            print(board);
+
+            int state = eval(board);
+            if(state == 10) {
+                System.out.println("Computer wins");
+                break;
+            } else if(state == -10) {
+                System.out.println("You win!");
+                break;
+            } else if(isFull(board)) {
+                System.out.println("Draw");
+                break;
+            }
+
+            player = !player;
+        }
+        s.close();
+    }
+
+    private static int[] findBestMove() {
+        int best = Integer.MIN_VALUE;
+        int bestX = -1;
+        int bestY = -1;
+
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                if(board[currBoard[1]][currBoard[0]][i][j] == 0) {
+                    board[currBoard[1]][currBoard[0]][i][j] = 1;
+                    int eval = minimax(0, false);
+                    board[currBoard[1]][currBoard[0]][i][j] = 0;
+                    if(eval > best) {
+                        best = eval;
+                        bestX = j;
+                        bestY = i;
+                    }
+                }
+            }
+        }
+
+        return new int[] {bestX, bestY, best};
+    }
+
+    private static int minimax(int depth, boolean isAI) {
+        int score = eval(board);
+        if(score != 0) {
+            return score;
+        }
+
+        if(isFull(board)) {
+            return 0;
+        }
+
+        if(isAI) {
+            int best = Integer.MIN_VALUE;
+            for(int i = 0; i < 3; ++i) {
+                for(int j = 0; j < 3; ++j) {
+                    if(board[i][j] == 0) {
+                        board[i][j] = 1;
+                        best = Math.max(minimax(board, depth + 1, false), best);
+                        board[i][j] = 0;
+                    }
+                }
+            }
+            return best - depth;
+        } else {
+            int best = Integer.MAX_VALUE;
+            for(int i = 0; i < 3; ++i) {
+                for(int j = 0; j < 3; ++j) {
+                    if(board[i][j] == 0) {
+                        board[i][j] = -1;
+                        best = Math.min(minimax(board, depth + 1, true), best);
+                        board[i][j] = 0;
+                    }
+                }
+            }
+            return best + depth;
+        }
+    }
+
+    private static int eval(int[][][][] board) {
+        int[][] captured = new int[3][3];
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                if(isFull(board[i][j])) {
+                    captured[i][j] = board[i][j][0][0];
+                } else {
+                    captured[i][j] = 0;
+                }
+            }
+        }
+
+        int sum = 0;
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                sum += captured[i][j];
+            }
+            if(Math.abs(sum) == 3) {
+                return sum/3 * 1000;
+            }
+            sum = 0;
+        }
+
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                sum += captured[j][i];
+            }
+            if(Math.abs(sum) == 3) {
+                return sum/3 * 1000;
+            }
+            sum = 0;
+        }
+
+        for(int i = 0; i < 3; ++i) {
+            sum += captured[i][i];
+        }
+        if(Math.abs(sum) == 3) {
+            return sum/3 * 1000;
+        }
+        sum = 0;
+
+        for(int i = 0; i < 3; ++i) {
+            sum += captured[i][2 - i];
+        }
+        if(Math.abs(sum) == 3) {
+            return sum/3 * 1000;
+        }
+        sum = 0;
+
+        return 0;
+    }
+
+    private static int[][][][] checkBoardWin(int[][][][] board) {
+        for(int a = 0; a < 3; ++a) {
+            for(int b = 0; b < 3; ++b) {
+                if(!isFull(board[a][b])) {
+                    int sum = 0;
+                    for(int i = 0; i < 3; ++i) {
+                        for(int j = 0; j < 3; ++j) {
+                            sum += board[a][b][i][j];
+                        }
+                        if(Math.abs(sum) == 3) {
+                            for(int[] row : board[a][b]) {
+                                Arrays.fill(row, sum/3);
+                            }
+                            return board;
+                        }
+                        sum = 0;
+                    }
+
+                    for(int i = 0; i < 3; ++i) {
+                        for(int j = 0; j < 3; ++j) {
+                            sum += board[a][b][j][i];
+                        }
+                        if(Math.abs(sum) == 3) {
+                            for(int[] row : board[a][b]) {
+                                Arrays.fill(row, sum/3);
+                            }
+                            return board;
+                        }
+                        sum = 0;
+                    }
+
+                    for(int i = 0; i < 3; ++i) {
+                        sum += board[a][b][i][i];
+                    }
+                    if(Math.abs(sum) == 3) {
+                        for(int[] row : board[a][b]) {
+                            Arrays.fill(row, sum/3);
+                        }
+                        return board;
+                    }
+                    sum = 0;
+
+                    for(int i = 0; i < 3; ++i) {
+                        sum += board[a][b][i][2 - i];
+                    }
+                    if(Math.abs(sum) == 3) {
+                        for(int[] row : board[a][b]) {
+                            Arrays.fill(row, sum/3);
+                        }
+                        return board;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static boolean isFull(int[][] board) {
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                if(board[i][j] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean isInteger(String str) {
+        try {
+            Integer.parseInt(str);
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
+    }
+}
