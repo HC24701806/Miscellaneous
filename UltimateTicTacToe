@@ -2,10 +2,9 @@ import java.util.*;
 
 public class UltimateTicTacToe {
     static int x;
-    static int[][][][] board = new int[3][3][3][3];
-    static int[] currBoard;
     public static void main(String[] args) {
-        currBoard = new int[] {-1, -1};
+        int[][][][] board = new int[3][3][3][3];
+        int[] currBoard = new int[] {-1, -1};
 
         Scanner s = new Scanner(System.in);
         System.out.println("X or O?");
@@ -33,13 +32,17 @@ public class UltimateTicTacToe {
                         String[] temp = input.split(" ");
                         if(!isInteger(temp[0]) || !isInteger(temp[1])) {
                             System.out.println("Invalid input, please try again.");
-                        } else if(x < 0 || x >= 3 || y < 0 || y >= 3) {
-                            System.out.println("Invalid input, please enter another coordinate.");
-                        } else if(isFull(board[y][x])) {
-                            System.out.println("This board is already full.");
                         } else {
-                            currBoard = new int[] {x, y};
-                            break;
+                            x = Integer.parseInt(temp[0]);
+                            y = Integer.parseInt(temp[1]);
+                            if(x < 0 || x >= 3 || y < 0 || y >= 3) {
+                                System.out.println("Invalid input, please enter another coordinate.");
+                            } else if(isFull(board[y][x])) {
+                                System.out.println("This board is already full.");
+                            } else {
+                                currBoard = new int[]{x, y};
+                                break;
+                            }
                         }
                     }
                 }
@@ -50,31 +53,46 @@ public class UltimateTicTacToe {
                     String[] temp = input.split(" ");
                     if(!isInteger(temp[0]) || !isInteger(temp[1])) {
                         System.out.println("Invalid input, please try again.");
-                    } else if(x < 0 || x >= 3 || y < 0 || y >= 3) {
-                        System.out.println("Invalid input, please enter another coordinate.");
-                    } else if(board[currBoard[1]][currBoard[0]][y][x] != 0) {
-                        System.out.println("This coordinate is already taken.");
                     } else {
-                        board[currBoard[1]][currBoard[0]][y][x] = -1;
-                        currBoard = new int[] {y, x};
-                        break;
+                        x = Integer.parseInt(temp[0]);
+                        y = Integer.parseInt(temp[1]);
+                        if(x < 0 || x >= 3 || y < 0 || y >= 3) {
+                            System.out.println("Invalid input, please enter another coordinate.");
+                        } else if(board[currBoard[1]][currBoard[0]][y][x] != 0) {
+                            System.out.println("This coordinate is already taken.");
+                        } else {
+                            board[currBoard[1]][currBoard[0]][y][x] = -1;
+                            currBoard = new int[] {y, x};
+                            break;
+                        }
                     }
                 }
 
             } else {
-                int[] bestMove = findBestMove();
+                int[] bestMove = findBestMove(board, currBoard);
                 board[currBoard[1]][currBoard[0]][bestMove[1]][bestMove[0]] = 1;
             }
             print(board);
 
             int state = eval(board);
-            if(state == 10) {
+            if(state == 1000) {
                 System.out.println("Computer wins");
                 break;
-            } else if(state == -10) {
+            } else if(state == -1000) {
                 System.out.println("You win!");
                 break;
-            } else if(isFull(board)) {
+            }
+
+            boolean draw = true;
+            for(int i = 0; i < 3; ++i) {
+                for(int j = 0; j < 3; ++j) {
+                    if(board[i][j][0][0] == Integer.MIN_VALUE) {
+                        draw = false;
+                        break;
+                    }
+                }
+            }
+            if(draw) {
                 System.out.println("Draw");
                 break;
             }
@@ -84,7 +102,7 @@ public class UltimateTicTacToe {
         s.close();
     }
 
-    private static int[] findBestMove() {
+    private static int[] findBestMove(int[][][][] board, int[] currBoard) {
         int best = Integer.MIN_VALUE;
         int bestX = -1;
         int bestY = -1;
@@ -93,7 +111,7 @@ public class UltimateTicTacToe {
             for(int j = 0; j < 3; ++j) {
                 if(board[currBoard[1]][currBoard[0]][i][j] == 0) {
                     board[currBoard[1]][currBoard[0]][i][j] = 1;
-                    int eval = minimax(0, false);
+                    int eval = minimax(board, currBoard,0, false);
                     board[currBoard[1]][currBoard[0]][i][j] = 0;
                     if(eval > best) {
                         best = eval;
@@ -107,13 +125,22 @@ public class UltimateTicTacToe {
         return new int[] {bestX, bestY, best};
     }
 
-    private static int minimax(int depth, boolean isAI) {
+    private static int minimax(int[][][][] board, int[] currBoard, int depth, boolean isAI) {
         int score = eval(board);
         if(score != 0) {
             return score;
         }
 
-        if(isFull(board)) {
+        boolean draw = true;
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                if(!isFull(board[i][j])) {
+                    draw = false;
+                    break;
+                }
+            }
+        }
+        if(draw) {
             return 0;
         }
 
@@ -121,10 +148,15 @@ public class UltimateTicTacToe {
             int best = Integer.MIN_VALUE;
             for(int i = 0; i < 3; ++i) {
                 for(int j = 0; j < 3; ++j) {
-                    if(board[i][j] == 0) {
-                        board[i][j] = 1;
-                        best = Math.max(minimax(board, depth + 1, false), best);
-                        board[i][j] = 0;
+                    if(board[currBoard[1]][currBoard[0]][i][j] == 0) {
+                        int tempX = currBoard[0];
+                        int tempY = currBoard[1];
+                        board[currBoard[1]][currBoard[0]][i][j] = 1;
+                        if(Math.abs(board[i][j][0][0]) > 1) {
+                            currBoard = new int[] {-1, -1};
+                        }
+                        best = Math.max(minimax(board, currBoard, depth + 1, false), best);
+                        board[currBoard[1]][currBoard[0]][i][j] = 0;
                     }
                 }
             }
@@ -133,10 +165,10 @@ public class UltimateTicTacToe {
             int best = Integer.MAX_VALUE;
             for(int i = 0; i < 3; ++i) {
                 for(int j = 0; j < 3; ++j) {
-                    if(board[i][j] == 0) {
-                        board[i][j] = -1;
-                        best = Math.min(minimax(board, depth + 1, true), best);
-                        board[i][j] = 0;
+                    if(board[currBoard[1]][currBoard[0]][i][j] == 0) {
+                        board[currBoard[1]][currBoard[0]][i][j] = -1;
+                        best = Math.min(minimax(board, currBoard,depth + 1, true), best);
+                        board[currBoard[1]][currBoard[0]][i][j] = 0;
                     }
                 }
             }
@@ -148,7 +180,7 @@ public class UltimateTicTacToe {
         int[][] captured = new int[3][3];
         for(int i = 0; i < 3; ++i) {
             for(int j = 0; j < 3; ++j) {
-                if(isFull(board[i][j])) {
+                if(Math.abs(board[i][j][0][0]) == 2) {
                     captured[i][j] = board[i][j][0][0];
                 } else {
                     captured[i][j] = 0;
@@ -162,7 +194,7 @@ public class UltimateTicTacToe {
                 sum += captured[i][j];
             }
             if(Math.abs(sum) == 3) {
-                return sum/3 * 1000;
+                return sum/6 * 1000;
             }
             sum = 0;
         }
@@ -172,7 +204,7 @@ public class UltimateTicTacToe {
                 sum += captured[j][i];
             }
             if(Math.abs(sum) == 3) {
-                return sum/3 * 1000;
+                return sum/6 * 1000;
             }
             sum = 0;
         }
@@ -181,7 +213,7 @@ public class UltimateTicTacToe {
             sum += captured[i][i];
         }
         if(Math.abs(sum) == 3) {
-            return sum/3 * 1000;
+            return sum/6 * 1000;
         }
         sum = 0;
 
@@ -189,65 +221,65 @@ public class UltimateTicTacToe {
             sum += captured[i][2 - i];
         }
         if(Math.abs(sum) == 3) {
-            return sum/3 * 1000;
+            return sum/6 * 1000;
         }
         sum = 0;
 
         return 0;
     }
 
-    private static int[][][][] checkBoardWin(int[][][][] board) {
-        for(int a = 0; a < 3; ++a) {
-            for(int b = 0; b < 3; ++b) {
-                if(!isFull(board[a][b])) {
-                    int sum = 0;
-                    for(int i = 0; i < 3; ++i) {
-                        for(int j = 0; j < 3; ++j) {
-                            sum += board[a][b][i][j];
-                        }
-                        if(Math.abs(sum) == 3) {
-                            for(int[] row : board[a][b]) {
-                                Arrays.fill(row, sum/3);
-                            }
-                            return board;
-                        }
-                        sum = 0;
-                    }
-
-                    for(int i = 0; i < 3; ++i) {
-                        for(int j = 0; j < 3; ++j) {
-                            sum += board[a][b][j][i];
-                        }
-                        if(Math.abs(sum) == 3) {
-                            for(int[] row : board[a][b]) {
-                                Arrays.fill(row, sum/3);
-                            }
-                            return board;
-                        }
-                        sum = 0;
-                    }
-
-                    for(int i = 0; i < 3; ++i) {
-                        sum += board[a][b][i][i];
-                    }
-                    if(Math.abs(sum) == 3) {
-                        for(int[] row : board[a][b]) {
-                            Arrays.fill(row, sum/3);
-                        }
-                        return board;
-                    }
-                    sum = 0;
-
-                    for(int i = 0; i < 3; ++i) {
-                        sum += board[a][b][i][2 - i];
-                    }
-                    if(Math.abs(sum) == 3) {
-                        for(int[] row : board[a][b]) {
-                            Arrays.fill(row, sum/3);
-                        }
-                        return board;
-                    }
+    private static int[][] checkBoardWin(int[][] board) {
+        int sum = 0;
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                sum += board[i][j];
+            }
+            if(Math.abs(sum) == 3) {
+                for(int[] row : board) {
+                    Arrays.fill(row, sum/3 * 2);
                 }
+                return board;
+            }
+            sum = 0;
+        }
+
+        for(int i = 0; i < 3; ++i) {
+            for(int j = 0; j < 3; ++j) {
+                sum += board[j][i];
+            }
+            if(Math.abs(sum) == 3) {
+                for (int[] row : board) {
+                    Arrays.fill(row, sum/3 * 2);
+                }
+                return board;
+            }
+            sum = 0;
+        }
+        for(int i = 0; i < 3; ++i) {
+            sum += board[i][i];
+        }
+        if(Math.abs(sum) == 3) {
+            for(int[] row : board) {
+                Arrays.fill(row, sum/3 * 2);
+            }
+            return board;
+        }
+        sum = 0;
+
+        for(int i = 0; i < 3; ++i) {
+            sum += board[i][2 - i];
+        }
+        if(Math.abs(sum) == 3) {
+            for(int[] row : board) {
+                Arrays.fill(row, sum/3 * 2);
+            }
+            return board;
+        }
+
+        if(isFull(board)) {
+            for(int[] row : board) {
+                Arrays.fill(row, Integer.MIN_VALUE);
+                return board;
             }
         }
         return null;
@@ -271,5 +303,36 @@ public class UltimateTicTacToe {
             return false;
         }
         return true;
+    }
+
+    private static void print(int[][][][] board) {
+        char[] symbols;
+        if(x == 0) {
+            symbols = new char[] {'X', ' ', 'O'};
+        } else {
+            symbols = new char[] {'O', ' ', 'X'};
+        }
+
+        for(int a = 0; a < 3; ++a) {
+            for(int i = 0; i < 3; ++i) {
+                for (int b = 0; b < 3; ++b) {
+                    for (int j = 0; j < 2; ++j) {
+                        System.out.print(symbols[board[a][b][i][j] + 1] + " | ");
+                    }
+                    System.out.print(symbols[board[a][b][i][2] + 1]);
+                    if (b < 2) {
+                        System.out.print(" || ");
+                    } else {
+                        System.out.println();
+                    }
+                }
+
+                if(a < 2 && i == 2) {
+                    System.out.println("====================================");
+                } else if(i < 2) {
+                    System.out.println("------------------------------------");
+                }
+            }
+        }
     }
 }
