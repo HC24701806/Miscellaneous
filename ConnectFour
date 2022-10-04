@@ -3,6 +3,7 @@ import java.util.*;
 public class ConnectFour {
     static int x;
     static int[] lowest;
+    static int numChips = 0;
     public static void main(String[] args) {
         int[][] board = new int[6][7];
 
@@ -39,6 +40,7 @@ public class ConnectFour {
                         } else {
                             board[lowest[col]][col] = -1;
                             lowest[col]--;
+                            numChips++;
                             break;
                         }
                     } else {
@@ -51,6 +53,7 @@ public class ConnectFour {
                 int bestMove = findBestMove(board);
                 board[lowest[bestMove]][bestMove] = 1;
                 lowest[bestMove]--;
+                numChips++;
             }
             print(board);
 
@@ -95,10 +98,10 @@ public class ConnectFour {
     }
 
     private static int minimax(int[][] board, int depth, boolean isAI, int a, int b) {
-    	if(depth == 12) {
-    		return 0;
-    	}
-    	
+        if(depth == maxDepth(board)) {
+            return 0;
+        }
+
         int score = eval(board);
         if(score != 0) {
             return score;
@@ -119,9 +122,9 @@ public class ConnectFour {
                     a = Math.max(a, best);
                     lowest[i]++;
                     board[lowest[i]][i] = 0;
-                    
+
                     if(a > b) {
-                    	break;
+                        break;
                     }
                 }
             }
@@ -136,9 +139,9 @@ public class ConnectFour {
                     b = Math.min(b, best);
                     lowest[i]++;
                     board[lowest[i]][i] = 0;
-                    
+
                     if(a > b) {
-                    	break;
+                        break;
                     }
                 }
             }
@@ -247,5 +250,9 @@ public class ConnectFour {
             return false;
         }
         return true;
+    }
+
+    private static int maxDepth(int[][] board) {
+        return (int) (numChips/42.0 * 20 + 12);
     }
 }
