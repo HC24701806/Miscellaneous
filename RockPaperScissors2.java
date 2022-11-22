@@ -17,6 +17,7 @@ public class RockPaperScissors2 {
         int decision;
         double[] results = new double[] {0.5, 0, 1, 1, 0.5, 0, 0, 1, 0.5};
         for(int i = 0; i < 20; ++i) {
+            //computer choosing
             if(last == -1) {
                 row = 0;
             } else {
@@ -31,6 +32,7 @@ public class RockPaperScissors2 {
                 decision = 0;
             }
 
+            //user input
             while(true) {
                 System.out.print("Rock (0), paper (1), scissors (2): ");
                 input = Integer.parseInt(s.next());
@@ -40,15 +42,18 @@ public class RockPaperScissors2 {
                 System.out.println("Invalid output, please try again.");
             }
 
+            //updating data
             if(last != -1) {
                 frequencies[last][input]++;
                 frequencies[last][3]++;
             }
             last = input;
 
+            //determining result
             player += results[input * 3 + decision];
             computer += (1 - results[input * 3 + decision]);
         }
+        //results
         System.out.println(player + " " + computer);
         System.out.println(Arrays.deepToString(frequencies));
     }
