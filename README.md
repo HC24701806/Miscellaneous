@@ -1,1 +1,1 @@
-# Random projects that I did for fun
+Random projects that I did for fun
