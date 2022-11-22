@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class TataRapid2022 { //2022 Tata Steel Rapid/Blitz
+public class TataRapid2022 { //Predictions for 2022 Tata Steel Rapid/Blitz
 	
 	static class Player {
 		String name;
