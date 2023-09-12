@@ -28,6 +28,7 @@ public class ConnectFour {
         lowest = new int[7];
         Arrays.fill(lowest, 5);
         while(true) {
+            print(board);
             if(player) {
                 int col;
                 while(true) {
@@ -47,32 +48,30 @@ public class ConnectFour {
                         System.out.println("Invalid input, please try again.");
                     }
                 }
-
             } else {
-                System.out.println("Processing, please wait.\n");
+                System.out.println("Thinking...\n");
                 int bestMove = findBestMove(board);
                 board[lowest[bestMove]][bestMove] = 1;
                 lowest[bestMove]--;
                 numChips++;
             }
-            print(board);
 
             int state = eval(board);
             if(state == 100) {
-                System.out.println("Computer wins");
+                System.out.println("Computer wins\n");
                 break;
             } else if(state == -100) {
-                System.out.println("You win!");
+                System.out.println("You win!\n");
                 break;
             } else if(isFull(board)) {
-                System.out.println("Draw");
+                System.out.println("Draw\n");
                 break;
             }
 
             player = !player;
         }
         s.close();
-        eval(board);
+        print(board);
     }
 
     private static int findBestMove(int[][] board) {
@@ -227,18 +226,24 @@ public class ConnectFour {
     }
 
     private static void print(int[][] board) {
-        char[] symbols;
+        String[] colors;
+        String reset = "\u001B[0m";
         if(x == 0) {
-            symbols = new char[] {'Y', ' ', 'R'};
+            colors = new String[] {"\u001B[43m   ", "   ", "\u001B[41m   "};
         } else {
-            symbols = new char[] {'R', ' ', 'Y'};
+            colors = new String[] {"\u001B[41m   ", "   ", "\u001B[43m   "};
         }
 
         for(int i = 0; i < 6; ++i) {
             for(int j = 0; j < 6; ++j) {
-                System.out.print(symbols[board[i][j] + 1] + " | ");
+                System.out.print(colors[board[i][j] + 1] + reset + "|");
             }
-            System.out.println(symbols[board[i][6] + 1]);
+            System.out.println(colors[board[i][6] + 1] + reset);
+        }
+
+        System.out.print(" ");
+        for(int i = 0; i < 7; ++i) {
+            System.out.print(i + "   ");
         }
         System.out.println("\n");
     }
@@ -253,6 +258,6 @@ public class ConnectFour {
     }
 
     private static int maxDepth(int[][] board) {
-        return (int) (numChips/42.0 * 20 + 12);
+        return (int) (numChips/42.0 * 20 + 8);
     }
 }
